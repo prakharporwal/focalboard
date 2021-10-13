@@ -12,7 +12,7 @@ import './dialog.scss'
 
 type Props = {
     children: React.ReactNode
-    toolsMenu: React.ReactNode
+    toolsMenu?: React.ReactNode
     hideCloseButton?: boolean
     className?: string
     onClose: () => void,
