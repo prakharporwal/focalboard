@@ -41,9 +41,9 @@ const CardDetailProperties = React.memo((props: Props) => {
     const intl = useIntl()
     const {board, card, cards, views, activeView, contents, comments} = props
 
-    let [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false)
-    let [deletingPropId, setDeletingPropId] = useState<string>('')
-    let [deletingPropName, setDeletingPropName] = useState<string>('')
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false)
+    const [deletingPropId, setDeletingPropId] = useState<string>('')
+    const [deletingPropName, setDeletingPropName] = useState<string>('')
 
     let [dialogState,setDialogState] = useState<ConfirmationDialog>({heading:'',onClose:()=>{},onConfirm:()=>{},confirmButtonText:''}); 
 
@@ -70,8 +70,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                                         setDeletingPropId(id)
                                         setDeletingPropName(propertyTemplate.name)
                                         setShowConfirmationDialog(true)
-                                        console.log('prakhar',dialogState)
-                                        }
+                                    }
                                     }
                                 />
                             </MenuWrapper>
@@ -94,14 +93,18 @@ const CardDetailProperties = React.memo((props: Props) => {
                     propertyId={deletingPropId}
                     onClose={() => setShowConfirmationDialog(false)}
                     onConfirm={() => {
-                        mutator.deleteProperty(board, views, cards, deletingPropId);
-                        setShowConfirmationDialog(false);
-                        sendFlashMessage({content: intl.formatMessage({id: 'CardDetailProperty.property-deleted', defaultMessage: `Deleted ${deletingPropName}!`}), severity: 'high'})
+                        mutator.deleteProperty(board, views, cards, deletingPropId)
+                        setShowConfirmationDialog(false)
+                        sendFlashMessage({content: intl.formatMessage({id: 'CardDetailProperty.property-deleted', defaultMessage: 'Deleted {propertyName} Successfully!'}, {propertyName: deletingPropName}), severity: 'high'})
                     }}
 
-                    heading={intl.formatMessage({id: 'CardDetailProperty.confirm-delete', defaultMessage: 'Confirm Delete Property', })}
-                    subText={intl.formatMessage({id: 'CardDetailProperty.confirm-delete-subtext', defaultMessage: `Are you sure you want to delete the property "${deletingPropName}"? Deleting it will delete the property from all cards in this board.`})}
-                    dialogState={dialogState}
+                    heading={intl.formatMessage({id: 'CardDetailProperty.confirm-delete', defaultMessage: 'Confirm Delete Property'})}
+                    subText={intl.formatMessage({
+                        id: 'CardDetailProperty.confirm-delete-subtext',
+                        defaultMessage: 'Are you sure you want to delete the property "{propertyName}"? Deleting it will delete the property from all cards in this board.',
+                    },
+                    {propertyName: deletingPropName})
+                    }
                 />
             }
 

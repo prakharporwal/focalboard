@@ -2,8 +2,10 @@
 // See LICENSE.txt for license information.
 
 import React from 'react'
+import {FormattedMessage} from 'react-intl'
 
 import Button from '../widgets/buttons/button'
+
 import Dialog from './dialog'
 import './confirmationDialogBox.scss'
 import {FormattedMessage} from 'react-intl';
@@ -14,8 +16,7 @@ type Props = {
     onConfirm: () => void;
     heading: string;
     subText?: string;
-    dialogState: ConfirmationDialog
-};
+}
 
 type ConfirmationDialog = {
     onClose: () => void;
@@ -28,14 +29,17 @@ type ConfirmationDialog = {
 
 export const ConfirmationDialogBox = (props: Props) => {
     return (
-        <Dialog className='confirmation-dialog-box' onClose={props.onClose}>
+        <Dialog
+            className='confirmation-dialog-box'
+            onClose={props.onClose}
+        >
             <div className='box-area'>
                 <h3 className='heading'>{props.heading}</h3>
                 <p className='sub-text'>{props.subText}</p>
 
                 <div className='action-buttons'>
                     <Button
-                        title='cancel-button'
+                        title='Cancel'
                         active={true}
                         onClick={props.onClose}
                     >
@@ -45,7 +49,7 @@ export const ConfirmationDialogBox = (props: Props) => {
                         />
                     </Button>
                     <Button
-                        title='delete-button'
+                        title='Delete'
                         submit={true}
                         emphasis='danger'
                         onClick={props.onConfirm}
@@ -58,7 +62,5 @@ export const ConfirmationDialogBox = (props: Props) => {
                 </div>
             </div>
         </Dialog>
-    );
-};
-
-
+    )
+}
