@@ -41,7 +41,7 @@ class Mutator {
         const groupId = this.beginUndoGroup()
         try {
             await actions()
-        } catch (err) {
+        } catch (err:any) {
             Utils.assertFailure(`ERROR: ${err?.toString?.()}`)
         }
         if (groupId) {

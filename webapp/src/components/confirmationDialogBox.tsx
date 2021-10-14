@@ -8,26 +8,30 @@ import Button from '../widgets/buttons/button'
 import Dialog from './dialog'
 import './confirmationDialogBox.scss'
 
-type Props = {
-    propertyId: string;
+type ConfirmationDialog = {
     onClose: () => void;
     onConfirm: () => void;
+    confirmButtonText:string;
     heading: string;
     subText?: string;
+}
+
+type Props = {
+    dialogState: ConfirmationDialog
 };
 
 export const ConfirmationDialogBox = (props: Props) => {
     return (
-        <Dialog className='confirmation-dialog-box' onClose={props.onClose}>
+        <Dialog className='confirmation-dialog-box' onClose={props.dialogState.onClose}>
             <div className='box-area'>
-                <h3 className='heading'>{props.heading}</h3>
-                <p className='sub-text'>{props.subText}</p>
+                <h3 className='heading'>{props.dialogState.heading}</h3>
+                <p className='sub-text'>{props.dialogState.subText}</p>
 
                 <div className='action-buttons'>
                     <Button
                         title='cancel-button'
                         active={true}
-                        onClick={props.onClose}
+                        onClick={props.dialogState.onClose}
                     >
                         <FormattedMessage
                             id='ConfirmationDialog.cancel-action'
@@ -38,12 +42,10 @@ export const ConfirmationDialogBox = (props: Props) => {
                         title='delete-button'
                         submit={true}
                         emphasis='danger'
-                        onClick={props.onConfirm}
+                        onClick={props.dialogState.onConfirm}
                     >
-                        <FormattedMessage
-                            id='ConfirmationDialog.delete-action'
-                            defaultMessage='Delete'
-                        />
+                        {props.dialogState.confirmButtonText}
+
                     </Button>
                 </div>
             </div>
