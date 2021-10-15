@@ -10,9 +10,9 @@ import Dialog from './dialog'
 import './confirmationDialogBox.scss'
 
 type Props = {
-    propertyId: string;
+    propertyId?: string;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (...args:any[]) => void;
     heading: string;
     subText?: string;
 }

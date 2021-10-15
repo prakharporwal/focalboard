@@ -18,6 +18,8 @@ import GalleryIcon from '../../widgets/icons/gallery'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 
+import {sendFlashMessage} from '../flashMessages'
+import {ConfirmationDialogBox} from '../confirmationDialogBox'
 import './sidebarBoardItem.scss'
 
 type Props = {
@@ -100,90 +102,108 @@ const SidebarBoardItem = React.memo((props: Props) => {
     const displayTitle: string = board.title || intl.formatMessage({id: 'Sidebar.untitled-board', defaultMessage: '(Untitled Board)'})
     const boardViews = sortBoardViewsAlphabetically(views.filter((view) => view.parentId === board.id))
 
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false)
+
     return (
-        <div className='SidebarBoardItem'>
-            <div
-                className={`octo-sidebar-item ' ${collapsed ? 'collapsed' : 'expanded'} ${board.id === props.activeBoardId ? 'active' : ''}`}
-                onClick={() => showBoard(board.id)}
-            >
-                <IconButton
-                    icon={<DisclosureTriangle/>}
-                    onClick={() => setCollapsed(!collapsed)}
-                />
+        <>
+            <div className='SidebarBoardItem'>
                 <div
-                    className='octo-sidebar-title'
-                    title={displayTitle}
+                    className={`octo-sidebar-item ' ${collapsed ? 'collapsed' : 'expanded'} ${board.id === props.activeBoardId ? 'active' : ''}`}
+                    onClick={() => showBoard(board.id)}
                 >
-                    {board.fields.icon ? `${board.fields.icon} ${displayTitle}` : displayTitle}
-                </div>
-                <MenuWrapper stopPropagationOnToggle={true}>
-                    <IconButton icon={<OptionsIcon/>}/>
-                    <Menu position='left'>
-                        <Menu.Text
-                            id='deleteBoard'
-                            name={intl.formatMessage({id: 'Sidebar.delete-board', defaultMessage: 'Delete board'})}
-                            icon={<DeleteIcon/>}
-                            onClick={async () => {
-                                mutator.deleteBlock(
-                                    board,
-                                    intl.formatMessage({id: 'Sidebar.delete-board', defaultMessage: 'Delete board'}),
-                                    async () => {
-                                        if (props.nextBoardId) {
-                                            // This delay is needed because WSClient has a default 100 ms notification delay before updates
-                                            setTimeout(() => {
-                                                showBoard(props.nextBoardId)
-                                            }, 120)
-                                        }
-                                    },
-                                    async () => {
-                                        showBoard(board.id)
-                                    },
-                                )
-                            }}
-                        />
-
-                        <Menu.Text
-                            id='duplicateBoard'
-                            name={intl.formatMessage({id: 'Sidebar.duplicate-board', defaultMessage: 'Duplicate board'})}
-                            icon={<DuplicateIcon/>}
-                            onClick={() => {
-                                duplicateBoard(board.id || '')
-                            }}
-                        />
-
-                        <Menu.Text
-                            id='templateFromBoard'
-                            name={intl.formatMessage({id: 'Sidebar.template-from-board', defaultMessage: 'New template from board'})}
-                            onClick={() => {
-                                addTemplateFromBoard(board.id || '')
-                            }}
-                        />
-                    </Menu>
-                </MenuWrapper>
-            </div>
-            {!collapsed && boardViews.length === 0 &&
-                <div className='octo-sidebar-item subitem no-views'>
-                    <FormattedMessage
-                        id='Sidebar.no-views-in-board'
-                        defaultMessage='No pages inside'
+                    <IconButton
+                        icon={<DisclosureTriangle/>}
+                        onClick={() => setCollapsed(!collapsed)}
                     />
-                </div>}
-            {!collapsed && boardViews.map((view) => (
-                <div
-                    key={view.id}
-                    className={`octo-sidebar-item subitem ${view.id === props.activeViewId ? 'active' : ''}`}
-                    onClick={() => showView(view.id, board.id)}
-                >
-                    {iconForViewType(view.fields.viewType)}
                     <div
                         className='octo-sidebar-title'
-                        title={view.title || intl.formatMessage({id: 'Sidebar.untitled-view', defaultMessage: '(Untitled View)'})}
+                        title={displayTitle}
                     >
-                        {view.title || intl.formatMessage({id: 'Sidebar.untitled-view', defaultMessage: '(Untitled View)'})}
+                        {board.fields.icon ? `${board.fields.icon} ${displayTitle}` : displayTitle}
                     </div>
+                    <MenuWrapper stopPropagationOnToggle={true}>
+                        <IconButton icon={<OptionsIcon/>}/>
+                        <Menu position='left'>
+                            <Menu.Text
+                                id='deleteBoard'
+                                name={intl.formatMessage({id: 'Sidebar.delete-board', defaultMessage: 'Delete board'})}
+                                icon={<DeleteIcon/>}
+                                onClick={async () => {
+                                    
+                                    setShowConfirmationDialog(true)
+                                }}
+                            />
+
+                            <Menu.Text
+                                id='duplicateBoard'
+                                name={intl.formatMessage({id: 'Sidebar.duplicate-board', defaultMessage: 'Duplicate board'})}
+                                icon={<DuplicateIcon/>}
+                                onClick={() => {
+                                    duplicateBoard(board.id || '')
+                                }}
+                            />
+
+                            <Menu.Text
+                                id='templateFromBoard'
+                                name={intl.formatMessage({id: 'Sidebar.template-from-board', defaultMessage: 'New template from board'})}
+                                onClick={() => {
+                                    addTemplateFromBoard(board.id || '')
+                                }}
+                            />
+                        </Menu>
+                    </MenuWrapper>
                 </div>
-            ))}
-        </div>
+                {!collapsed && boardViews.length === 0 &&
+                    <div className='octo-sidebar-item subitem no-views'>
+                        <FormattedMessage
+                            id='Sidebar.no-views-in-board'
+                            defaultMessage='No pages inside'
+                        />
+                    </div>}
+                {!collapsed && boardViews.map((view) => (
+                    <div
+                        key={view.id}
+                        className={`octo-sidebar-item subitem ${view.id === props.activeViewId ? 'active' : ''}`}
+                        onClick={() => showView(view.id, board.id)}
+                    >
+                        {iconForViewType(view.fields.viewType)}
+                        <div
+                            className='octo-sidebar-title'
+                            title={view.title || intl.formatMessage({id: 'Sidebar.untitled-view', defaultMessage: '(Untitled View)'})}
+                        >
+                            {view.title || intl.formatMessage({id: 'Sidebar.untitled-view', defaultMessage: '(Untitled View)'})}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {showConfirmationDialog &&
+                <ConfirmationDialogBox
+                    heading={intl.formatMessage({id: 'Sidebar.delete-board-confirmation-heading', defaultMessage: 'Confirm Board Deletion'})}
+                    subText={intl.formatMessage({id: 'Sidebar.delete-board-confirmation-subtext', defaultMessage: 'Are you sure nibba? All your work on the board "{boardName}" will be gone'}, {boardName: board.title})}
+                    onConfirm={ async()=>{
+                        mutator.deleteBlock(
+                            board,
+                            intl.formatMessage({id: 'Sidebar.delete-board', defaultMessage: 'Delete board'}),
+                            async () => {
+                                if (props.nextBoardId) {
+                                    // This delay is needed because WSClient has a default 100 ms notification delay before updates
+                                    setTimeout(() => {
+                                        showBoard(props.nextBoardId)
+                                    }, 120)
+                                }
+                            },
+                            async () => {
+                                showBoard(board.id)
+                            },
+                        )
+                        sendFlashMessage({content: intl.formatMessage({id: 'Sidebar-delete-board-success', defaultMessage: ' deleted successfully!'}), severity: 'high'})
+                    }}
+                    onClose={() => setShowConfirmationDialog(false)}
+                />
+            }
+        
+        </>
     )
 })
 
